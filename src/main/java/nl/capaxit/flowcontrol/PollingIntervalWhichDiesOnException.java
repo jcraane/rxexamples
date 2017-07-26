@@ -15,6 +15,6 @@ public class PollingIntervalWhichDiesOnException {
                         throwable -> System.out.println("DEAD"),
                         () -> System.out.println("DEAD"));
 
-        Thread.sleep(10000);
+        Thread.sleep(2500);
     }
 }
