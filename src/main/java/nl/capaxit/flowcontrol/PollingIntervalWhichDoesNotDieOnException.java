@@ -6,6 +6,8 @@ import java.util.concurrent.TimeUnit;
 
 public class PollingIntervalWhichDoesNotDieOnException {
     public static void main(String[] args) throws InterruptedException {
+//        If you do care that your outer stream (merge, concat, interval etc. should continue in exceptions, it is best
+        // to handle the error in the inner streams (in the switchMap in the following example).
         Observable.interval(500, TimeUnit.MILLISECONDS)
                 .switchMap(i -> BackendService.getResponse(i == 3)
                         .doOnError(throwable -> System.out.println("Error from service"))
