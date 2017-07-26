@@ -1,0 +1,6 @@
+rx for
+- composing multiple events together
+- adding delay
+- coordinating asynchrounous tasks
+- when cancellation is required
+- execute code in the background
