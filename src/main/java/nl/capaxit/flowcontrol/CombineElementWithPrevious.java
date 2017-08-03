@@ -9,7 +9,7 @@ public class CombineElementWithPrevious {
         final Observable<Integer> numbers = Observable.from(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 7));
         numbers
                 .zipWith(numbers
-                        .skip(1), (f, s) -> Arrays.asList(f, s))
+                        .skip(1), (first, second) -> Arrays.asList(first, second))
                 .subscribe(System.out::println);
     }
 }
