@@ -8,7 +8,6 @@ import rx.schedulers.Schedulers;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -22,7 +21,9 @@ public class RxImageScaler {
         return Observable.from(ScalingSpecification.getIdentifiers())
                 .concatMap(identifier ->
                         Observable.from(images)
-                                .flatMap(image -> getImage(image, desiredHeight, identifier, outputDir))
+                                .flatMap(image -> getImage(image, desiredHeight, identifier, outputDir)
+                                        .doOnError(throwable -> System.out.println("Error scaling: " + image))
+                                        .onErrorResumeNext(Observable.empty()))
                 );
     }
 
@@ -45,7 +46,8 @@ public class RxImageScaler {
         return Observable.concat(
                 getImageFromDisk(name, identifier, outputDir).doOnNext(r -> System.out.println(String.format("From disk -> %s for %s", name, identifier))),
                 scaleImage(name, desiredHeight, identifier, outputDir).doOnNext(r -> System.out.println(String.format("Scale -> %s for %s", name, identifier)))
-        ).take(1);
+        )
+                .take(1);
     }
 
     public Observable<ImageResult> getImage(final String name,
@@ -56,7 +58,8 @@ public class RxImageScaler {
         return Observable.concat(
                 getImageFromDisk(name, identifier, outputDir, scheduler).doOnNext(r -> System.out.println(String.format("From disk -> %s for %s", name, identifier))),
                 scaleImage(name, desiredHeight, identifier, outputDir, scheduler).doOnNext(r -> System.out.println(String.format("Scale -> %s for %s", name, identifier)))
-        ).take(1);
+        )
+                .take(1);
     }
 
     public Observable<ImageResult> getImageFromDisk(final String name,
@@ -75,7 +78,7 @@ public class RxImageScaler {
             if (imageFile.exists()) {
                 try {
                     return Observable.just(new ImageResult(ImageIO.read(imageFile)));
-                } catch (IOException e) {
+                } catch (Exception e) {
                     return Observable.error(e);
                 }
             }
