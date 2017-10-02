@@ -1,5 +1,6 @@
 package nl.capaxit.rxexamples.imagescaling;
 
+import com.google.common.io.Files;
 import org.imgscalr.Scalr;
 import rx.Observable;
 import rx.Scheduler;
@@ -77,7 +78,7 @@ public class RxImageScaler {
             final File imageFile = FileHelper.getImageFile(name, mutiplier, outputDir);
             if (imageFile.exists()) {
                 try {
-                    return Observable.just(new ImageResult(ImageIO.read(imageFile)));
+                    return Observable.just(new ImageResult(ImageIO.read(imageFile), Files.getFileExtension(name)));
                 } catch (Exception e) {
                     return Observable.error(e);
                 }
@@ -103,16 +104,18 @@ public class RxImageScaler {
             final String outputDir,
             final Scheduler scheduler) {
         return Observable.fromCallable(() -> {
-            final InputStream inputStream = getClass().getResourceAsStream(name);
-            final JpegReader jpegReader = new JpegReader();
-            final BufferedImage image = jpegReader.readImage(inputStream, System.getProperty("java.io.tmpdir"));
+            try (final InputStream inputStream = getClass().getResourceAsStream(name)) {
+                final JpegReader jpegReader = new JpegReader();
+                final BufferedImage image = jpegReader.readImage(inputStream, System.getProperty("java.io.tmpdir"));
+                final Double mutiplier = ScalingSpecification.getMultiplier(identifier);
+                final double height = desiredHeight * mutiplier;
+                final BufferedImage resizedImage = Scalr.resize(image, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.FIT_TO_WIDTH, (int) height);
+                final File imageFile = FileHelper.getImageFile(name, mutiplier, outputDir);
+                final String format = Files.getFileExtension(name);
+                ImageIO.write(resizedImage, format, imageFile);
+                return new ImageResult(image, format);
+            }
 
-            final Double mutiplier = ScalingSpecification.getMultiplier(identifier);
-            final double height = desiredHeight * mutiplier;
-            final BufferedImage resizedImage = Scalr.resize(image, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.FIT_TO_WIDTH, (int) height);
-            final File imageFile = FileHelper.getImageFile(name, mutiplier, outputDir);
-            ImageIO.write(resizedImage, "png", imageFile);
-            return new ImageResult(image);
         })
                 .subscribeOn(scheduler);
     }
