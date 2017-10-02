@@ -109,7 +109,7 @@ public class RxImageScaler {
                 final BufferedImage image = jpegReader.readImage(inputStream, System.getProperty("java.io.tmpdir"));
                 final Double mutiplier = ScalingSpecification.getMultiplier(identifier);
                 final double height = desiredHeight * mutiplier;
-                final BufferedImage resizedImage = Scalr.resize(image, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.FIT_TO_WIDTH, (int) height);
+                final BufferedImage resizedImage = Scalr.resize(image, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.FIT_TO_HEIGHT, (int) height);
                 final File imageFile = FileHelper.getImageFile(name, mutiplier, outputDir);
                 final String format = Files.getFileExtension(name);
                 ImageIO.write(resizedImage, format, imageFile);
