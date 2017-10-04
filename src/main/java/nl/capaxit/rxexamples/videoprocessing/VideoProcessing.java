@@ -4,6 +4,8 @@ import rx.Observable;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class VideoProcessing {
@@ -35,10 +37,10 @@ public class VideoProcessing {
 
     private void run() throws InterruptedException {
         // Serial processing. Consumer cannot keep up with producer.
-        webcamSubject
+        /*webcamSubject
                 .doOnNext(image -> System.out.println("received " + image))
                 .map(image -> doProcessImage(image))
-                .subscribe(processedImage -> System.out.println("final image " + processedImage.image.id));
+                .subscribe(processedImage -> System.out.println("final image " + processedImage.image.id));*/
 
         // Parallel but events are delivered out of order when there are slight variations in processing time.
         /*webcamSubject
@@ -47,7 +49,7 @@ public class VideoProcessing {
                 .subscribe(processedImage -> System.out.println("final image " + processedImage.image.id));*/
 
         // Parallel processing.
-       /* webcamSubject
+        webcamSubject
                 .doOnNext(image -> System.out.println("received " + image))
                 .buffer(8) // Process 8 images at once
                 .doOnNext(System.out::println)
@@ -55,6 +57,21 @@ public class VideoProcessing {
                         .flatMap(this::procesImage) // process each image im parallel
                         .toSortedList() // collect all process images in a list and sort based on the order the images are received from the video stream
                         .flatMapIterable(i -> i)) // emit the images as separate events downstream
+                .subscribe(processedImage -> System.out.println("final image " + processedImage.image.id));
+
+//        Parallel processing but only take the first image which is done (the fastes) out of the batch of 8 images.
+        /*webcamSubject
+                .doOnNext(image -> System.out.println("received " + image))
+                .buffer(8) // Process 8 images at once
+                .concatMap(images -> {
+                    final List<Observable<ProcessedImage>> toProcess = new ArrayList<>();
+                    for (final Image image : images) {
+                        toProcess.add(procesImage(image));
+                    }
+                    return Observable.merge(toProcess)
+                            .take(1);
+                })
+                .doOnNext(System.out::println)
                 .subscribe(processedImage -> System.out.println("final image " + processedImage.image.id));*/
     }
 
@@ -69,7 +86,7 @@ public class VideoProcessing {
             System.out.println("Process image " + image.id);
             Thread.sleep(IMAGE_PROCESSING_TIME + RANDOM.nextInt(SLEEP_VARIATION));
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            // Ignore
         }
         return processedImage;
     }
