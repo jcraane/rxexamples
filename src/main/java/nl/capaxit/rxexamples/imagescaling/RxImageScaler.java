@@ -17,8 +17,6 @@ public class RxImageScaler {
             final List<String> images,
             final int desiredHeight,
             final String outputDir) {
-        // By using concatMap instead of flatMap for the identifiers we maken sure all identifiers are process in order. This means that if
-        // an identifier exists with the same scale factor, the image can be read from disk.
         return Observable.from(ScalingSpecification.getIdentifiers())
                 .concatMap(identifier ->
                         Observable.from(images)
