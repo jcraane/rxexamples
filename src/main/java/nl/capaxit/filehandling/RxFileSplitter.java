@@ -5,7 +5,7 @@ import rx.Observable;
 import java.io.File;
 import java.io.FileInputStream;
 
-public class RxFileSplitter {
+public final class RxFileSplitter {
     private final int numBytes;
 
     public RxFileSplitter(final int numBytes) {
