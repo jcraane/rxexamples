@@ -17,6 +17,7 @@ dependencies {
     compile 'com.squareup.retrofit2:adapter-rxjava:2.0.2'
     compile 'com.squareup.okhttp:mockwebserver:2.7.5'
     compile "com.google.guava:guava:18.0"
+    compile group: 'org.apache.commons', name: 'commons-io', version: '1.3.2'
 
     /* Image Scaling libs */
     compile group: 'org.apache.sanselan', name: 'sanselan', version: '0.97-incubator'
