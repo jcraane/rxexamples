@@ -1,6 +1,8 @@
 package nl.capaxit.filehandling;
 
 import rx.Observable;
+import rx.Scheduler;
+import rx.schedulers.Schedulers;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,7 +15,11 @@ public final class RxFileSplitter {
     }
 
     public Observable<Chunk> split(final File original) {
-        return rx.Observable.create(subscriber -> {
+        return split(original, Schedulers.io());
+    }
+
+    public Observable<Chunk> split(final File original, final Scheduler scheduler) {
+        return rx.Observable.<Chunk>create(subscriber -> {
             try (final FileInputStream fis = new FileInputStream(original)) {
                 int remainingBytes = (int) original.length(), part = 0;
                 while (remainingBytes > 0) {
@@ -31,7 +37,7 @@ public final class RxFileSplitter {
             } catch (final Throwable throwable) {
                 subscriber.onError(throwable);
             }
-        });
+        }).subscribeOn(scheduler);
     }
 
     public static final class Chunk {

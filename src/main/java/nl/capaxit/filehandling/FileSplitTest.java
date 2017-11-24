@@ -18,9 +18,9 @@ public class FileSplitTest {
         final InputStream is = getClass().getResourceAsStream("/testfiles/IMG_3781.JPG");
         final File output = new File("out/admin.mp4");
         IOUtils.copy(is, new FileOutputStream(output));
-        new RxFileSplitter(1024 * 1024)
-                .split(output)
-                .subscribeOn(Schedulers.immediate())
+        final int megabyte = 1024 * 1024;
+        new RxFileSplitter(megabyte)
+                .split(output, Schedulers.immediate())
                 .doOnNext(System.out::println)
                 .switchMap(chunk -> Observable.fromCallable(() -> {
                     IOUtils.write(chunk.getBytes(), new FileOutputStream(new File("out/IMG_3781" + chunk.getPart() + ".JPG")));
