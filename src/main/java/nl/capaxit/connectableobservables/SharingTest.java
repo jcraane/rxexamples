@@ -28,7 +28,7 @@ public class SharingTest {
         // here the same happens so we see two diffferent results
         shareObs.subscribe(t -> System.out.println(t));
 
-        final Observable<Long> autoConnectObs = Observable.fromCallable(() -> System.nanoTime()).share().replay().autoConnect();
+        final Observable<Long> autoConnectObs = Observable.fromCallable(() -> System.nanoTime()).replay().autoConnect();
 
         System.out.println("autoconnect");
         autoConnectObs.subscribe(t -> System.out.println(t));
