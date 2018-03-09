@@ -16,6 +16,7 @@ public class SqsReceiverSample {
 
     private void run() throws InterruptedException {
         receive()
+                .subscribeOn(Schedulers.io())
                 .concatMap(this::handleMessages) // The concatMap makes sure the polling of the next messages starts if all the inner observables complete.
                 .doOnError(Throwable::printStackTrace)
                 .doOnCompleted(() -> System.out.println("COMPLETED -----------------------------------"))
