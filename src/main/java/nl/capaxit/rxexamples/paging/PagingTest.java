@@ -1,18 +1,33 @@
 package nl.capaxit.rxexamples.paging;
 
 import io.reactivex.Observable;
+import io.reactivex.functions.Predicate;
 
 import java.util.Arrays;
 
 public class PagingTest {
     public static void main(String[] args) {
+        System.out.println("takeUntil");
+        getResultsTillConditionUsingTakeUntil();
+        System.out.println("Take");
+        getResultsTillConditionUsingTake();
+    }
+
+    private static void getResultsTillConditionUsingTakeUntil() {
         Observable.range(0, 4)
                 .doOnNext(page -> System.out.println("page = " + page))
-                .concatMap(page -> getResult(page))
+                .concatMap(PagingTest::getResult)
                 .filter(r -> !"Cancelled".equals(r))
-                .takeUntil(s -> {
-                    return "Valid".equals(s);
-                })
+                .takeUntil((Predicate<String>) "Valid"::equals)
+                .subscribe(System.out::println);
+    }
+
+    private static void getResultsTillConditionUsingTake() {
+        Observable.range(0, 4)
+                .doOnNext(page -> System.out.println("page = " + page))
+                .concatMap(PagingTest::getResult)
+                .filter(r -> !"Cancelled".equals(r))
+                .take(1)
                 .subscribe(System.out::println);
     }
 
