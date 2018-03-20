@@ -5,7 +5,7 @@ import io.reactivex.Observable
 fun getObservable(number: Int) = if (number < 4) Observable.empty<Int>() else Observable.just(number)
 
 fun main(args: Array<String>) {
-//    Below code all yield the result but differ in readability.
+//    Below code all yield the same result but differ in readability.
     getObservable(1)
             .switchIfEmpty(getObservable(2)
                     .switchIfEmpty(getObservable(3)
