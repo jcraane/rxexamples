@@ -21,14 +21,19 @@ fun main(args: Array<String>) {
     Observable.concat(listOf(getObservable(1), getObservable(2), getObservable(3), getObservable(4)))
             .subscribe({ println(it)})
 
-    println("empty")
+    println("switchIfEmpty")
     getObservableTwo(1)
             .switchIfEmpty(getObservableTwo(2))
             .switchIfEmpty(getObservableTwo(3))
             .switchIfEmpty(getObservableTwo(4))
             .subscribe({ println(it)})
 
-    println("concat")
+    println("Without take(1) concat has not the same behaviour as switchIfEmpty")
     Observable.concat(listOf(getObservableTwo(1), getObservableTwo(2), getObservableTwo(3), getObservableTwo(4)))
+            .subscribe({ println(it)})
+
+    println("With take(1) we have the same behaviour as switchIfEmpty")
+    Observable.concat(listOf(getObservableTwo(1), getObservableTwo(2), getObservableTwo(3), getObservableTwo(4)))
+            .take(1)
             .subscribe({ println(it)})
 }
